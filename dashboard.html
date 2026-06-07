@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --bg-body: #121214;
+            --sidebar-bg: #1a1a1e;
+            --card-bg: #1e1e24;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --border: #2d2d34;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(37, 99, 235, 0.1);
+            --border: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            color: var(--text-sub);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active a {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sub-nav-links {
+            list-style: none;
+            margin-left: 15px;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sub-nav-links .nav-item a {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            padding: 14px 18px;
+            color: #ef4444;
+            background: none;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+        }
+
+        header { margin-bottom: 35px; }
+        header h1 { font-size: 2.2rem; font-weight: 700; }
+        .header-sub { color: var(--text-sub); margin-top: 4px; }
+        
+        .mood-display-tag {
+            display: inline-block;
+            margin-top: 10px;
+            background: var(--sidebar-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .progress-wrapper { margin: 15px 0; }
+        .progress-text-pct { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+        .progress-track {
+            width: 100%; height: 10px; background: var(--bg-body); border-radius: 20px; overflow: hidden; margin-top: 10px;
+            border: 1px solid var(--border);
+        }
+        .progress-fill {
+            width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .task-creator-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .task-creator-form input, .task-creator-form select {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            background: var(--bg-body);
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-action:hover { background: var(--primary-hover); }
+
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
+        .task-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px; border: 1px solid var(--border); border-radius: 12px;
+            background: var(--sidebar-bg); transition: 0.2s;
+        }
+        .task-left { display: flex; align-items: center; gap: 14px; }
+        .task-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+        .task-label { font-size: 0.95rem; font-weight: 500; color: var(--text-main); }
+        .task-item.completed .task-label { text-decoration: line-through; opacity: 0.5; }
+        
+        .task-actions-right { display: flex; align-items: center; gap: 12px; }
+        .task-date-stamp { font-size: 0.75rem; color: var(--text-sub); background: var(--bg-body); padding: 4px 8px; border-radius: 6px; font-weight: 500; border: 1px solid var(--border); }
+        .btn-delete { background: none; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.5; }
+        .btn-delete:hover { opacity: 1; }
+
+        .badge { font-size: 0.72rem; padding: 4px 10px; border-radius: 6px; font-weight: 600; text-transform: capitalize; }
+        .badge.math { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .badge.science { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .badge.history { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge.english { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge.geography { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        .badge.art { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .badge.computing { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+
+        .mood-box-flex { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .btn-mood { padding: 12px 4px; border: 1px solid var(--border); border-radius: 10px; background: var(--sidebar-bg); color: var(--text-sub); font-size: 0.8rem; font-weight: 500; cursor: pointer; }
+        .btn-mood.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        @media(max-width: 1024px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="sidebar-brand"> AuraLearn</div>
+            <ul class="nav-links">
+                <li class="nav-item active" id="tab-dashboard">
+                    <a href="dashboard.html"> Dashboard</a>
+                </li>
+                <li class="nav-item" id="tab-calendar">
+                    <a href="calendar.html"> Calendar View</a>
+                    <ul class="sub-nav-links">
+					                    <a href="timer.html"> Focus Timer</a>
+							<li class="nav-item" id="tab-settings"><a href="settings.html"> Settings</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <button onclick="logOut()" class="logout-btn"> Log Out</button>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1>Welcome back, <span class="welcomeUserNode"></span> </h1>
+            <div class="header-sub">Review statistics, performance metrics, or use the left sidebar tabs to navigate tools.</div>
+        </header>
+
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <div style="display:flex; justify-content: space-between; align-items: flex-end;">
+                        <h3 style="font-weight: 600; font-size: 1.1rem;">Assignment Completion Metrics</h3>
+                        <div class="progress-text-pct currentProgressPctNode">0% Complete</div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <div class="progress-track">
+                            <div class="progress-fill currentProgressBarNode"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Course Assignment Manager</div>
+                    
+                    <form class="task-creator-form" onsubmit="handleNewFormTaskSubmission(event)">
+                        <input type="text" class="taskInputNode" placeholder="Assignment details..." required>
+                        <select class="subjectInputNode">
+                            <option value="math">Math</option>
+                            <option value="science">Science</option>
+                            <option value="history">History</option>
+                            <option value="english">English</option>
+                            <option value="geography">Geography</option>
+                            <option value="art">Art</option>
+                            <option value="computing">Computing</option>
+                        </select>
+                        <input type="date" class="taskDateInputNode" required>
+                        <button type="submit" class="btn-action">Schedule Task</button>
+                    </form>
+                    
+                    <div class="task-list masterSharedTaskContainer"></div>
+                </div>
+            </div>
+
+          
+        </div>
+    </main>
+
+    <script>
+        // Synchronized task database
+        let masterDatabaseTasksArray = JSON.parse(localStorage.getItem("aura_tasks")) || [
+            { id: 1, text: "Final Math Exam Prep", subject: "math", date: "2026-06-01", completed: false },
+            { id: 2, text: "Analyze maps of coastal erosion", subject: "geography", date: "2026-06-08", completed: false },
+            { id: 3, text: "Read Chapters 3 and 4 of Frankenstein", subject: "english", date: "2026-06-12", completed: true }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Theme Sync
+            const savedTheme = localStorage.getItem("aura_theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+
+            // User Name Sync
+            const cachedName = localStorage.getItem("aura_name") || "Student";
+            document.querySelectorAll(".welcomeUserNode").forEach(node => node.innerText = cachedName);
+            
+            // Set default date picker to today's date context
+            const todayStr = new Date("2026-06-07").toISOString().split('T')[0];
+            document.querySelectorAll(".taskDateInputNode").forEach(el => el.value = todayStr);
+
+            // Sync structural mood state
+            const savedMood = localStorage.getItem("aura_mood") || "Focused 🧠";
+            document.querySelectorAll('.moodStatusBadgeNode').forEach(badge => badge.innerText = "Current Mood: " + savedMood);
+            document.querySelectorAll('.btn-mood').forEach(btn => {
+                if(btn.innerText === savedMood.split(' ')[0]) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+
+            saveDataToLocalStorage();
+            renderMasterSharedDashboardTasks();
+        });
+
+        function saveDataToLocalStorage() {
+            localStorage.setItem("aura_tasks", JSON.stringify(masterDatabaseTasksArray));
+        }
+
+        function renderMasterSharedDashboardTasks() {
+            const containerNode = document.querySelector(".masterSharedTaskContainer");
+            if (!containerNode) return;
+            containerNode.innerHTML = "";
+
+            masterDatabaseTasksArray.forEach(task => {
+                const taskRow = document.createElement('div');
+                taskRow.className = `task-item ${task.completed ? 'completed' : ''}`;
+                
+                const splitDate = task.date.split('-');
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const displayStampString = splitDate.length === 3 ? `${months[parseInt(splitDate[1])-1]} ${splitDate[2]}` : 'Sched';
+
+                taskRow.innerHTML = `
+                    <div class="task-left">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskDataState(${task.id})">
+                        <span class="task-label">${task.text}</span>
+                    </div>
+                    <div class="task-actions-right">
+                        <span class="task-date-stamp">${displayStampString}</span>
+                        <span class="badge ${task.subject}">${task.subject}</span>
+                        <button class="btn-delete" onclick="deleteTaskDataRecord(${task.id})">🗑️</button>
+                    </div>
+                `;
+                containerNode.appendChild(taskRow);
+            });
+
+            calculateMetricsAnalyticsFormulas();
+        }
+
+        function handleNewFormTaskSubmission(eventElement) {
+            eventElement.preventDefault();
+            const form = eventElement.target;
+            
+            masterDatabaseTasksArray.push({
+                id: Date.now(),
+                text: form.querySelector(".taskInputNode").value,
+                subject: form.querySelector(".subjectInputNode").value,
+                date: form.querySelector(".taskDateInputNode").value,
+                completed: false
+            });
+
+            form.querySelector(".taskInputNode").value = "";
+            saveDataToLocalStorage();
+            renderMasterSharedDashboardTasks();
+        }
+
+        function toggleTaskDataState(targetTaskId) {
+            const index = masterDatabaseTasksArray.findIndex(t => t.id === targetTaskId);
+            if (index !== -1) {
+                masterDatabaseTasksArray[index].completed = !masterDatabaseTasksArray[index].completed;
+            }
+            saveDataToLocalStorage();
+            renderMasterSharedDashboardTasks();
+        }
+
+        function deleteTaskDataRecord(targetTaskId) {
+            masterDatabaseTasksArray = masterDatabaseTasksArray.filter(t => t.id !== targetTaskId);
+            saveDataToLocalStorage();
+            renderMasterSharedDashboardTasks();
+        }
+
+        function calculateMetricsAnalyticsFormulas() {
+            const total = masterDatabaseTasksArray.length;
+            const checked = masterDatabaseTasksArray.filter(t => t.completed).length;
+            let pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+
+            document.querySelectorAll(".currentProgressBarNode").forEach(bar => bar.style.width = pct + "%");
+            document.querySelectorAll(".currentProgressPctNode").forEach(txt => txt.innerText = pct + "% Complete");
+        }
+
+        function setGlobalAppMood(moodTextString, buttonClickedElement) {
+            document.querySelectorAll('.btn-mood').forEach(btn => btn.classList.remove('selected'));
+            buttonClickedElement.classList.add('selected');
+            localStorage.setItem("aura_mood", moodTextString);
+            document.querySelectorAll('.moodStatusBadgeNode').forEach(badge => badge.innerText = "Current Mood: " + moodTextString);
+        }
+
+        function logOut() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

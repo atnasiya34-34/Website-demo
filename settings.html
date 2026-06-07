@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        :root {
+            --bg-body: #121214; --sidebar-bg: #1a1a1e; --card-bg: #1e1e24;
+            --text-main: #f8fafc; --text-sub: #94a3b8; --primary: #3b82f6;
+            --primary-hover: #1d4ed8; --primary-light: rgba(59, 130, 246, 0.15);
+            --border: #2d2d34; --timer-bg: #16161a;
+        }
+        [data-theme="light"] {
+            --bg-body: #f8fafc; --sidebar-bg: #ffffff; --card-bg: #f1f5f9;
+            --text-main: #0f172a; --text-sub: #64748b; --primary: #2563eb;
+            --primary-hover: #1d4ed8; --primary-light: rgba(37, 99, 235, 0.1);
+            --border: #cbd5e1; --timer-bg: #e2e8f0;
+        }
+
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; }
+        
+        /* Master Sidebar Setup */
+        .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; height: 100vh; z-index: 10; transition: background 0.3s, border-color 0.3s; }
+        .sidebar-brand { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 40px; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item a { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 18px; color: var(--text-sub); text-decoration: none; border-radius: 12px; font-weight: 500; transition: 0.2s; }
+        .nav-item a:hover { background: rgba(255, 255, 255, 0.03); color: var(--text-main); }
+        .nav-item.active a { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .logout-btn { padding: 14px 18px; color: #ef4444; background: none; border: none; font-weight: 500; cursor: pointer; text-align: left; width: 100%; }
+
+        /* Main Workspace Viewport */
+        .main-content { flex: 1; margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
+        header { margin-bottom: 35px; }
+        header h1 { font-size: 2.2rem; font-weight: 700; }
+        .header-sub { color: var(--text-sub); margin-top: 4px; }
+
+        .settings-container { max-width: 800px; display: flex; flex-direction: column; gap: 25px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 30px; border: 1px solid var(--border); text-align: left; transition: background 0.3s, border-color 0.3s; }
+        
+        .section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
+        /* Configuration Field Components */
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 20px; }
+        .setting-info { flex: 1; }
+        .setting-title { font-weight: 500; font-size: 1rem; color: var(--text-main); }
+        .setting-desc { font-size: 0.85rem; color: var(--text-sub); margin-top: 2px; }
+        
+        .control-element input[type="text"], .control-element input[type="number"] { padding: 10px; background: var(--timer-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); width: 160px; outline: none; }
+        .control-element select { padding: 10px; background: var(--timer-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); width: 160px; cursor: pointer; }
+        
+        .btn-save-settings { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem; display: block; margin-left: auto; transition: 0.2s; }
+        .btn-save-settings:hover { background: var(--primary-hover); }
+        
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .btn-danger:hover { background: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="sidebar-brand">AuraLearn</div>
+            <ul class="nav-links">
+                <li class="nav-item" id="tab-dashboard"><a href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item" id="tab-calendar"><a href="calendar.html">Calendar View</a></li>
+                <li class="nav-item" id="tab-timer"><a href="timer.html">Focus Timer</a></li>
+                <li class="nav-item active" id="tab-settings"><a href="settings.html">Settings</a></li>
+            </ul>
+        </div>
+        <button onclick="logOut()" class="logout-btn">Log Out</button>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1>System Settings </h1>
+            <div class="header-sub">Configure display parameters, sound profiles, and control core ecosystem variables.</div>
+        </header>
+
+        <div class="settings-container">
+            
+            <div class="card">
+                <div class="section-title">Aesthetics & Preferences</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">User Greeting Name</div>
+                        <div class="setting-desc">Set your display name utilized on your tracking dashboard header.</div>
+                    </div>
+                    <div class="control-element">
+                        <input type="text" id="settingProfileName" placeholder="User">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Interface Visual Mode</div>
+                        <div class="setting-desc">Choose between a dark layout context or classic high-contrast light mode.</div>
+                    </div>
+                    <div class="control-element">
+                        <select id="settingThemeDropdown" onchange="applyLiveThemeChange(this.value)">
+                            <option value="dark">Dark Theme</option>
+                            <option value="light">Light Theme</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Timer Defaults Setup</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Default Focus Window</div>
+                        <div class="setting-desc">Baseline runtime value allocated to target workspace loops (Minutes).</div>
+                    </div>
+                    <div class="control-element">
+                        <input type="number" id="defaultFocusWindow" min="1" max="180" value="25">
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Default Break Window</div>
+                        <div class="setting-desc">Standard duration assigned to recovery rest states (Minutes).</div>
+                    </div>
+                    <div class="control-element">
+                        <input type="number" id="defaultBreakWindow" min="1" max="60" value="5">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-save-settings" onclick="saveSystemConfigurations()">Save Configurations</button>
+
+            <div class="card" style="border-color: rgba(239, 68, 68, 0.2); margin-top: 10px;">
+                <div class="section-title" style="color: #ef4444;">Session Management</div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Sign Out of Account</div>
+                        <div class="setting-desc">Securely close your active session and return to the main login portal screen.</div>
+                    </div>
+                    <div class="control-element">
+                        <button class="btn-danger" onclick="logOut()">Log Out</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Read saved theme profile settings or configure fallback standard properties
+            const savedTheme = localStorage.getItem('aura_app_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('settingThemeDropdown').value = savedTheme;
+
+            // Load existing profile name parameters values if present
+            const savedName = localStorage.getItem('aura_user_name');
+            if (savedName) {
+                document.getElementById('settingProfileName').value = savedName;
+            }
+        });
+
+        function applyLiveThemeChange(themeValue) {
+            // Apply live change updates instantly across document scopes
+            document.documentElement.setAttribute('data-theme', themeValue);
+            localStorage.setItem('aura_app_theme', themeValue);
+        }
+
+        function saveSystemConfigurations() {
+            const userNameInput = document.getElementById('settingProfileName').value.trim();
+            const focusMinutes = document.getElementById('defaultFocusWindow').value;
+            const breakMinutes = document.getElementById('defaultBreakWindow').value;
+
+            if (userNameInput) {
+                localStorage.setItem('aura_user_name', userNameInput);
+            }
+            
+            // Set initial timer intervals setup baselines configurations values
+            localStorage.setItem('aura_default_focus_config', focusMinutes);
+            localStorage.setItem('aura_default_break_config', breakMinutes);
+
+            alert("System configuration fields saved securely!");
+        }
+
+        function logOut() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

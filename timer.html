@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Focus Timer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --bg-body: #121214;
+            --sidebar-bg: #1a1a1e;
+            --card-bg: #1e1e24;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --border: #2d2d34;
+            --timer-bg: #16161a;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #f1f5f9;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(37, 99, 235, 0.1);
+            --border: #cbd5e1;
+            --timer-bg: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* MASTER NAVIGATION: Left Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            color: var(--text-sub);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active a {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 14px 18px;
+            color: #ef4444;
+            background: none;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { margin-bottom: 35px; }
+        header h1 { font-size: 2.2rem; font-weight: 700; }
+        .header-sub { color: var(--text-sub); margin-top: 4px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 5fr 3fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+            margin-bottom: 25px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        /* Timer UI Controls layout */
+        .timer-display-container {
+            background: var(--timer-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 280px;
+            height: 280px;
+            margin: 20px auto 30px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        .timer-countdown-digits {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .timer-mode-label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .timer-controls-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-timer {
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .btn-start { background: var(--primary); color: white; }
+        .btn-start:hover { background: var(--primary-hover); }
+        .btn-pause { background: #eab308; color: #1e1e24; }
+        .btn-pause:hover { background: #ca8a04; }
+        .btn-reset { background: #3f3f46; color: var(--text-main); }
+        .btn-reset:hover { background: #52525b; }
+
+        .preset-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            background: #27272a;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-preset:hover, .btn-preset.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-custom-trigger {
+            background: #22c55e;
+            color: white;
+            border: none;
+        }
+        .btn-custom-trigger:hover { background: #16a34a; }
+
+        /* Stats Sheet view panels */
+        .stats-list {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--timer-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label { color: var(--text-sub); font-size: 0.9rem; }
+        .stat-value { font-weight: 600; color: var(--primary); }
+
+        /* Sound Mixer CSS Layout overrides */
+        .mixer-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .mixer-slider {
+            flex: 1;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* MODAL POPUP QUICK SET CUSTOM TIMERS VIEW */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.modal-open { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+        .modal-overlay.modal-open .modal-card { transform: scale(1); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { font-size: 1.15rem; font-weight: 700; }
+        .btn-modal-close { background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 1.2rem; }
+
+        .modal-field { margin-bottom: 16px; }
+        .modal-field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; }
+        .modal-field input { width: 100%; padding: 12px; background: #121214; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; font-size: 0.9rem; }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .btn-action:hover { background: var(--primary-hover); }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="sidebar-brand">AuraLearn</div>
+            <ul class="nav-links">
+                <li class="nav-item" id="tab-dashboard"><a href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item" id="tab-calendar"><a href="calendar.html">Calendar View</a></li>
+                <li class="nav-item active" id="tab-timer"><a href="timer.html">Focus Timer</a></li>
+                <li class="nav-item" id="tab-settings"><a href="settings.html">Settings</a></li>
+            </ul>
+        </div>
+        <button onclick="logOut()" class="logout-btn">Log Out</button>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1>Focus Timer Space ️</h1>
+            <div class="header-sub">Tune out distractions, select intervals, or calibrate your custom pacer parameters.</div>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <div class="preset-buttons-container">
+                    <button class="btn-preset active" id="preset-pomo" onclick="setTimerPreset(25, 'Focus Session')">🧠 Pomodoro (25m)</button>
+                    <button class="btn-preset" id="preset-short" onclick="setTimerPreset(5, 'Short Break')">☕ Short Break (5m)</button>
+                    <button class="btn-preset" id="preset-long" onclick="setTimerPreset(15, 'Long Break')">🌴 Long Break (15m)</button>
+                    <button class="btn-preset btn-custom-trigger" onclick="openCustomIntervalModal()">⚙️ Custom Setup</button>
+                </div>
+
+                <div class="timer-display-container">
+                    <div class="timer-countdown-digits" id="timerDigitsDisplay">25:00</div>
+                    <div class="timer-mode-label" id="timerModeLabel">Focus Session</div>
+                </div>
+
+                <div class="timer-controls-row">
+                    <button class="btn-timer btn-start" id="btnStartPause" onclick="toggleTimerState()">Start</button>
+                    <button class="btn-timer btn-reset" onclick="resetTimerEngine()">Reset</button>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="card" style="text-align: left;">
+                    <h3 style="font-size: 1.15rem; font-weight: 600;">Session Tracking Metrics</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 4px;">Completed active intervals record themselves automatically here.</p>
+                    
+                    <div class="stats-list">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Completed Intervals</span>
+                            <span class="stat-value" id="statCompletedCount">0 Sessions</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Accumulated Focus Time</span>
+                            <span class="stat-value" id="statTotalMinutes">0 mins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="text-align: left;">
+                    <h3 style="font-size: 1.15rem; font-weight: 600;">Ambient Focus Sound</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 4px;">Generate brown/pink noise to isolate acoustical distractions.</p>
+                    <div class="mixer-controls">
+                        <button class="btn-timer btn-start" id="synthSoundBtn" onclick="toggleAmbientNoiseEngine()" style="padding: 8px 16px; font-size: 0.9rem;">Play Audio</button>
+                        <input type="range" id="synthVolumeSlider" class="mixer-slider" min="0" max="1" step="0.05" value="0.5" oninput="adjustMixerVolume(this.value)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="customTimerFormModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Configure Custom Intervals</h3>
+                <button type="button" class="btn-modal-close" onclick="closeCustomIntervalModal()">✕</button>
+            </div>
+            <form onsubmit="handleCustomIntervalSubmission(event)">
+                <div class="modal-field">
+                    <label>Work/Focus Interval (Minutes)</label>
+                    <input type="number" id="customWorkInput" min="1" max="180" value="45" required>
+                </div>
+                <div class="modal-field">
+                    <label>Rest/Break Interval (Minutes)</label>
+                    <input type="number" id="customRestInput" min="1" max="60" value="10" required>
+                </div>
+                <button type="submit" class="btn-action">Activate Custom Timer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Core Engine Counters Baseline Setup
+        let timerCountdownInstance = null;
+        let totalSecondsRemaining = 1500; 
+        let isTimerRunning = false;
+        let activePresetMinutes = 25;
+
+        // Custom parameters holders variables configuration anchors
+        let customWorkTimeConfig = 45;
+        let customRestTimeConfig = 10;
+        let isCustomWorkflowActive = false;
+
+        // Persistent Metrics Log targets
+        let completedSessionsCount = parseInt(localStorage.getItem("aura_timer_sessions")) || 0;
+        let totalFocusMinutesAccumulated = parseInt(localStorage.getItem("aura_timer_minutes")) || 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Core Global State Sync: Sync system theme variables
+            const savedTheme = localStorage.getItem('aura_app_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            updateStatsUIDisplay();
+            updateTimerGraphicDisplay();
+        });
+
+        function updateTimerGraphicDisplay() {
+            const minutes = Math.floor(totalSecondsRemaining / 60);
+            const seconds = totalSecondsRemaining % 60;
+            const paddedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            const paddedSeconds = seconds < 10 ? '0' + seconds : seconds;
+            
+            document.getElementById("timerDigitsDisplay").innerText = `${paddedMinutes}:${paddedSeconds}`;
+        }
+
+        function toggleTimerState() {
+            const actionButton = document.getElementById("btnStartPause");
+            
+            if (isTimerRunning) {
+                clearInterval(timerCountdownInstance);
+                isTimerRunning = false;
+                actionButton.innerText = "Start";
+                actionButton.className = "btn-timer btn-start";
+            } else {
+                isTimerRunning = true;
+                actionButton.innerText = "Pause";
+                actionButton.className = "btn-timer btn-pause";
+                
+                timerCountdownInstance = setInterval(() => {
+                    if (totalSecondsRemaining > 0) {
+                        totalSecondsRemaining--;
+                        updateTimerGraphicDisplay();
+                    } else {
+                        handleTimerIntervalCompletion();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimerEngine() {
+            clearInterval(timerCountdownInstance);
+            isTimerRunning = false;
+            
+            totalSecondsRemaining = activePresetMinutes * 60;
+            
+            const actionButton = document.getElementById("btnStartPause");
+            actionButton.innerText = "Start";
+            actionButton.className = "btn-timer btn-start";
+            
+            updateTimerGraphicDisplay();
+        }
+
+        function setTimerPreset(minutesValue, sessionLabelString) {
+            isCustomWorkflowActive = false;
+            document.querySelectorAll(".btn-preset").forEach(btn => btn.classList.remove("active"));
+            
+            if (minutesValue === 25) document.getElementById('preset-pomo').classList.add('active');
+            if (minutesValue === 5) document.getElementById('preset-short').classList.add('active');
+            if (minutesValue === 15) document.getElementById('preset-long').classList.add('active');
+
+            clearInterval(timerCountdownInstance);
+            isTimerRunning = false;
+            
+            activePresetMinutes = minutesValue;
+            totalSecondsRemaining = minutesValue * 60;
+            
+            document.getElementById("timerModeLabel").innerText = sessionLabelString;
+            document.getElementById("btnStartPause").innerText = "Start";
+            document.getElementById("btnStartPause").className = "btn-timer btn-start";
+            
+            updateTimerGraphicDisplay();
+        }
+
+        function openCustomIntervalModal() {
+            document.getElementById("customTimerFormModal").classList.add("modal-open");
+        }
+
+        function closeCustomIntervalModal() {
+            document.getElementById("customTimerFormModal").classList.remove("modal-open");
+        }
+
+        function handleCustomIntervalSubmission(event) {
+            event.preventDefault();
+            
+            customWorkTimeConfig = parseInt(document.getElementById("customWorkInput").value);
+            customRestTimeConfig = parseInt(document.getElementById("customRestInput").value);
+            isCustomWorkflowActive = true;
+
+            document.querySelectorAll(".btn-preset").forEach(btn => btn.classList.remove("active"));
+            
+            closeCustomIntervalModal();
+            setTimerPreset(customWorkTimeConfig, "Custom Focus Session");
+        }
+
+        function triggerRingingBellNotification() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                let osc1 = audioCtx.createOscillator();
+                let gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                
+                let osc2 = audioCtx.createOscillator();
+                let gain2 = audioCtx.createGain();
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(1200, audioCtx.currentTime);
+
+                gain1.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+                
+                gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+
+                osc1.start();
+                osc2.start();
+                
+                osc1.stop(audioCtx.currentTime + 1.3);
+                osc2.stop(audioCtx.currentTime + 1.3);
+            } catch (error) {
+                console.log("Audio contexts pending user browser activation permission triggers:", error);
+            }
+        }
+
+        function handleTimerIntervalCompletion() {
+            clearInterval(timerCountdownInstance);
+            isTimerRunning = false;
+            
+            triggerRingingBellNotification();
+            
+            const currentModeText = document.getElementById("timerModeLabel").innerText;
+            
+            if (currentModeText === "Focus Session" || currentModeText === "Custom Focus Session") {
+                completedSessionsCount += 1;
+                totalFocusMinutesAccumulated += activePresetMinutes;
+                
+                localStorage.setItem("aura_timer_sessions", completedSessionsCount);
+                localStorage.setItem("aura_timer_minutes", totalFocusMinutesAccumulated);
+                updateStatsUIDisplay();
+
+                if (isCustomWorkflowActive) {
+                    alert("Focus period complete! Switching onto your Custom Break time.");
+                    setTimerPreset(customRestTimeConfig, "Custom Break Session");
+                } else {
+                    alert("Focus period complete! Swapping onto a standard Short Break interval.");
+                    setTimerPreset(5, "Short Break");
+                }
+            } else {
+                alert("Break concluded! Ready to dive back into focus mode?");
+                if (isCustomWorkflowActive) {
+                    setTimerPreset(customWorkTimeConfig, "Custom Focus Session");
+                } else {
+                    setTimerPreset(25, "Focus Session");
+                }
+            }
+        }
+
+        function updateStatsUIDisplay() {
+            document.getElementById("statCompletedCount").innerText = `${completedSessionsCount} Sessions`;
+            document.getElementById("statTotalMinutes").innerText = `${totalFocusMinutesAccumulated} mins`;
+        }
+
+        function logOut() {
+            window.location.href = "index.html";
+        }
+
+        // Ambient Noise Engine Setup Code
+        let audioContextInstance = null, noiseGainNode = null, noiseBufferSourceNode = null;
+
+        function toggleAmbientNoiseEngine() {
+            const btn = document.getElementById("synthSoundBtn");
+            if (noiseBufferSourceNode) {
+                noiseBufferSourceNode.stop();
+                noiseBufferSourceNode = null;
+                btn.innerText = "Play Audio";
+                return;
+            }
+
+            if (!audioContextInstance) audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
+            noiseGainNode = audioContextInstance.createGain();
+            noiseGainNode.gain.value = document.getElementById("synthVolumeSlider").value;
+
+            const bufferSize = 2 * audioContextInstance.sampleRate;
+            const noiseBuffer = audioContextInstance.createBuffer(1, bufferSize, audioContextInstance.sampleRate);
+            const outputChannel = noiseBuffer.getChannelData(0);
+            let lastOutValue = 0.0;
+
+            for (let i = 0; i < bufferSize; i++) {
+                const whiteNoiseSample = Math.random() * 2 - 1;
+                outputChannel[i] = (lastOutValue + (0.02 * whiteNoiseSample)) / 1.02;
+                lastOutValue = outputChannel[i];
+                outputChannel[i] *= 3.5; 
+            }
+
+            noiseBufferSourceNode = audioContextInstance.createBufferSource();
+            noiseBufferSourceNode.buffer = noiseBuffer;
+            noiseBufferSourceNode.loop = true;
+            noiseBufferSourceNode.connect(noiseGainNode);
+            noiseGainNode.connect(audioContextInstance.destination);
+            noiseBufferSourceNode.start();
+            btn.innerText = "Stop Audio";
+        }
+
+        function adjustMixerVolume(vol) { 
+            if (noiseGainNode) noiseGainNode.gain.value = vol; 
+        }
+    </script>
+</body>
+</html>

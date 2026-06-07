@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        .left {
+            flex: 1;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #ffffff;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .left h1 {
+            font-size: 2.6rem;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .left p {
+            opacity: .85;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .right {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right h2 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: .85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: #0f172a;
+            background-color: #ffffff;
+            -webkit-appearance: none;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            font-size: .9rem;
+            color: #475569;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .options input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #3b82f6;
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #3b82f6;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .toggle-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toggle-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media(max-width: 850px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+            .container { 
+                flex-direction: column; 
+                border-radius: 16px;
+            }
+            .left { 
+                padding: 35px 25px; 
+            }
+            .left h1 { 
+                font-size: 1.8rem; 
+            }
+            .right { 
+                padding: 35px 25px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="left">
+        <div class="logo"> AuraLearn</div>
+        <h1>Your Smart Learning Space.</h1>
+        <p>Organize schedules, map out exam priorities, and maintain your academic momentum seamlessly.</p>
+    </div>
+
+    <div class="right">
+        <h2>Sign In</h2>
+        <p class="subtitle">Please enter any credentials to access your individual workspace.</p>
+
+        <form id="loginForm" action="javascript:void(0);" onsubmit="forceBrowserLogin()">
+            <div class="input-group">
+                <label for="loginEmail">Email or Username</label>
+                <!-- Type set to text to seamlessly allow any combination, plain names, or loose emails -->
+                <input type="text" id="loginEmail" placeholder="Enter username or email" required autocomplete="username">
+            </div>
+
+            <div class="input-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <div class="options">
+                <label>
+                    <input type="checkbox" id="rememberMe" checked>
+                    Remember Me
+                </label>
+            </div>
+
+            <button type="submit" class="form-btn">
+                Sign In
+            </button>
+        </form>
+
+        <div class="toggle-link">
+            Don't have an account? <a href="register.html">Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Auto Load last profile credentials if "Remember Me" was enabled
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedUser = localStorage.getItem("aura_remembered_user");
+        if (savedUser) {
+            document.getElementById('loginEmail').value = savedUser;
+        }
+    });
+
+    // 2. Adaptive Login Engine: Accepts any combination and stores individual user profiles
+    function forceBrowserLogin() {
+        const userInput = document.getElementById('loginEmail').value.trim();
+        const passwordValue = document.getElementById('loginPassword').value;
+        const rememberMeChecked = document.getElementById('rememberMe').checked;
+
+        if (!userInput) return;
+
+        // Clean user key string for database storage map structure
+        const storageUserKey = userInput.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+        // Extract a pretty presentation display name
+        let parsedName = userInput.split('@')[0];
+        parsedName = parsedName.charAt(0).toUpperCase() + parsedName.slice(1);
+
+        // Fetch or dynamically spin up a clean unique profile container block
+        let userProfile = localStorage.getItem(`aura_profile_${storageUserKey}`);
+        
+        if (!userProfile) {
+            // Profile doesn't exist yet? Create a unique space for this specific user structure instantly
+            const newProfileData = {
+                username: userInput,
+                displayName: parsedName,
+                password: passwordValue,
+                created: new Date().toISOString()
+            };
+            localStorage.setItem(`aura_profile_${storageUserKey}`, JSON.stringify(newProfileData));
+        }
+
+        // Set global references so the active session points to this user across other pages
+        localStorage.setItem("aura_current_user_key", storageUserKey);
+        localStorage.setItem("aura_user_name", parsedName);
+
+        // Handle Remember Me session caching
+        if (rememberMeChecked) {
+            localStorage.setItem("aura_remembered_user", userInput);
+        } else {
+            localStorage.removeItem("aura_remembered_user");
+        }
+
+        // Device friendly completion notification
+        alert(`Welcome back, ${parsedName}! 🚀`);
+        
+        // Immediate clean relocation layout transfer
+        window.location.replace("dashboard.html");
+    }
+</script>
+</body>
+</html>

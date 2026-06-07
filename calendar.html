@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Academic Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --bg-body: #121214;
+            --sidebar-bg: #1a1a1e;
+            --card-bg: #1e1e24;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --border: #2d2d34;
+            --today-circle: #3b82f6;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: rgba(37, 99, 235, 0.1);
+            --border: #cbd5e1;
+            --today-circle: #2563eb;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            color: var(--text-sub);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active a {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sub-nav-links {
+            list-style: none;
+            margin-left: 15px;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sub-nav-links .nav-item a {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            padding: 14px 18px;
+            color: #ef4444;
+            background: none;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+        }
+
+        header { margin-bottom: 35px; }
+        header h1 { font-size: 2.2rem; font-weight: 700; }
+        .header-sub { color: var(--text-sub); margin-top: 4px; }
+
+        .calendar-navbar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            background: var(--sidebar-bg);
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .calendar-nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cal-nav {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-cal-nav:hover { background: var(--primary-light); border-color: var(--primary); }
+
+        .calendar-month-year-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .large-calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            background: var(--bg-body);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .large-calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 14px 0;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .large-calendar-cell {
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            min-height: 120px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .large-calendar-cell:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .large-calendar-cell-num-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 28px;
+            height: 28px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .large-calendar-cell.is-today .large-calendar-cell-num-wrapper {
+            background: var(--today-circle);
+            color: white;
+            border-radius: 50%;
+        }
+
+        .large-calendar-cell.is-adjacent-month { opacity: 0.25; }
+
+        .large-calendar-cell-tasks-holder {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+            max-height: 80px;
+        }
+
+        .mini-calendar-task-pill {
+            font-size: 0.7rem;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            display: block;
+        }
+        .mini-calendar-task-pill.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .mini-calendar-task-pill.math { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .mini-calendar-task-pill.science { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .mini-calendar-task-pill.history { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .mini-calendar-task-pill.english { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .mini-calendar-task-pill.geography { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        .mini-calendar-task-pill.art { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .mini-calendar-task-pill.computing { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+
+        /* CREATOR POPUP MODAL STYLING */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.modal-open { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+        .modal-overlay.modal-open .modal-card { transform: scale(1); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-main); }
+        .btn-modal-close { background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 1.2rem; }
+
+        .modal-body label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+        .modal-body input, .modal-body select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div>
+            <div class="sidebar-brand"> AuraLearn</div>
+            <ul class="nav-links">
+                <li class="nav-item" id="tab-dashboard">
+                    <a href="dashboard.html"> Dashboard</a>
+                </li>
+                <li class="nav-item active" id="tab-calendar">
+                    <a href="calendar.html"> calendar View</a>
+                    <ul class="sub-nav-links">
+					                    <a href="timer.html"> Focus Timer</a>
+							<li class="nav-item" id="tab-settings"><a href="settings.html"> Settings</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <button onclick="logOut()" class="logout-btn"> Log Out</button>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1>Academic Calendar </h1>
+            <div class="header-sub">Click directly on any calendar cell item box to map assignments.</div>
+        </header>
+
+        <div class="calendar-navbar-header">
+            <div class="calendar-month-year-title" id="calendarMonthTitleNode">June 2026</div>
+            <div class="calendar-nav-controls">
+                <button class="btn-cal-nav" onclick="navigateCalendarMonths(-1)">Prev Month</button>
+                <button class="btn-cal-nav" onclick="resetCalendarToCurrentToday()">Today</button>
+                <button class="btn-cal-nav" onclick="navigateCalendarMonths(1)">Next Month</button>
+            </div>
+        </div>
+
+        <div class="large-calendar-container" id="calendarGridWrapperNode">
+            </div>
+    </main>
+
+    <div class="modal-overlay" id="taskCreatorModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Schedule New Task</h3>
+                <button class="btn-modal-close" onclick="closeCalendarModal()">✕</button>
+            </div>
+            <form id="modalTaskForm" onsubmit="handleModalFormSubmit(event)">
+                <div class="modal-body">
+                    <label>Target Assignment Date</label>
+                    <input type="date" id="modalTaskDate" readonly>
+
+                    <label>Assignment Details</label>
+                    <input type="text" id="modalTaskText" placeholder="Enter assignment notes..." required>
+
+                    <label>Subject Discipline</label>
+                    <select id="modalTaskSubject">
+                        <option value="math">Math</option>
+                        <option value="science">Science</option>
+                        <option value="history">History</option>
+                        <option value="english">English</option>
+                        <option value="geography">Geography</option>
+                        <option value="art">Art</option>
+                        <option value="computing">Computing</option>
+                    </select>
+
+                    <button type="submit" class="btn-action" style="width: 100%; margin-top: 10px;">Save to Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentActiveCalendarDate = new Date("2026-06-07"); 
+        const masterSystemTodayReference = new Date("2026-06-07");
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem("aura_theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            renderDynamicSystemCalendarLayout();
+        });
+
+        function renderDynamicSystemCalendarLayout() {
+            const gridWrapper = document.getElementById("calendarGridWrapperNode");
+            const titleNode = document.getElementById("calendarMonthTitleNode");
+            if(!gridWrapper) return;
+
+            gridWrapper.innerHTML = "";
+            
+            const currentYear = currentActiveCalendarDate.getFullYear();
+            const currentMonth = currentActiveCalendarDate.getMonth();
+
+            const stringsArrayMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            titleNode.innerText = `${stringsArrayMonths[currentMonth]} ${currentYear}`;
+
+            // Add Day of week ribbon header labels
+            const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            weekDays.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'large-calendar-day-header';
+                dayHeader.innerText = day;
+                gridWrapper.appendChild(dayHeader);
+            });
+
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDaysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const totalDaysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+            // 1. Render days of the previous month
+            for (let i = firstDayIndex - 1; i >= 0; i--) {
+                const cell = document.createElement('div');
+                cell.className = 'large-calendar-cell is-adjacent-month';
+                cell.innerHTML = `<div class="large-calendar-cell-num-wrapper">${totalDaysInPrevMonth - i}</div>`;
+                gridWrapper.appendChild(cell);
+            }
+
+            // 2. Render active month days
+            const globalStoredTasks = JSON.parse(localStorage.getItem("aura_tasks")) || [];
+
+            for (let day = 1; day <= totalDaysInCurrentMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'large-calendar-cell';
+                
+                // Formulate key identifier tag
+                const structuredDateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Check if target matches layout current today context
+                if (day === masterSystemTodayReference.getDate() && currentMonth === masterSystemTodayReference.getMonth() && currentYear === masterSystemTodayReference.getFullYear()) {
+                    cell.classList.add('is-today');
+                }
+
+                cell.setAttribute('data-date-string', structuredDateString);
+                cell.onclick = () => openCalendarModal(structuredDateString);
+
+                // Task filtering logic
+                const dayTasks = globalStoredTasks.filter(t => t.date === structuredDateString);
+                let tasksHTMLBlock = '';
+                
+                dayTasks.forEach(task => {
+                    tasksHTMLBlock += `
+                        <span class="mini-calendar-task-pill ${task.subject} ${task.completed ? 'completed' : ''}" title="${task.text}">
+                            ${task.completed ? '✓ ' : ''}${task.text}
+                        </span>
+                    `;
+                });
+
+                cell.innerHTML = `
+                    <div class="large-calendar-cell-num-wrapper">${day}</div>
+                    <div class="large-calendar-cell-tasks-holder">${tasksHTMLBlock}</div>
+                `;
+                gridWrapper.appendChild(cell);
+            }
+
+            // 3. Complete layout viewport tail cells remaining
+            const remainingGridBlocksCount = 42 - (firstDayIndex + totalDaysInCurrentMonth);
+            for (let dayCounter = 1; dayCounter <= remainingGridBlocksCount; dayCounter++) {
+                const cell = document.createElement('div');
+                cell.className = 'large-calendar-cell is-adjacent-month';
+                cell.innerHTML = `<div class="large-calendar-cell-num-wrapper">${dayCounter}</div>`;
+                gridWrapper.appendChild(cell);
+            }
+        }
+
+        function navigateCalendarMonths(directionValue) {
+            currentActiveCalendarDate.setMonth(currentActiveCalendarDate.getMonth() + directionValue);
+            renderDynamicSystemCalendarLayout();
+        }
+
+        function resetCalendarToCurrentToday() {
+            currentActiveCalendarDate = new Date(masterSystemTodayReference);
+            renderDynamicSystemCalendarLayout();
+        }
+
+        function openCalendarModal(targetDateString) {
+            document.getElementById("modalTaskDate").value = targetDateString;
+            document.getElementById("modalTaskText").value = "";
+            document.getElementById("taskCreatorModal").classList.add("modal-open");
+        }
+
+        function closeCalendarModal() {
+            document.getElementById("taskCreatorModal").classList.remove("modal-open");
+        }
+
+        function handleModalFormSubmit(e) {
+            e.preventDefault();
+            const date = document.getElementById("modalTaskDate").value;
+            const text = document.getElementById("modalTaskText").value;
+            const subject = document.getElementById("modalTaskSubject").value;
+
+            const existingTasksArray = JSON.parse(localStorage.getItem("aura_tasks")) || [];
+            existingTasksArray.push({
+                id: Date.now(),
+                text: text,
+                subject: subject,
+                date: date,
+                completed: false
+            });
+
+            localStorage.setItem("aura_tasks", JSON.stringify(existingTasksArray));
+            closeCalendarModal();
+            renderDynamicSystemCalendarLayout();
+        }
+
+        function logOut() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

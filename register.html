@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraLearn - Create Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        .left {
+            flex: 1;
+            background: linear-gradient(135deg, #1d4ed8, #0f172a);
+            color: #ffffff;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .left h1 {
+            font-size: 2.6rem;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .left p {
+            opacity: .85;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .right {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right h2 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: .85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: #0f172a;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.15);
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #1d4ed8;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .form-btn:hover {
+            background: #0f172a;
+            transform: translateY(-1px);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .toggle-link a {
+            color: #1d4ed8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toggle-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media(max-width:850px) {
+            .container { flex-direction: column; }
+            .left { padding: 40px; }
+            .right { padding: 40px; }
+            .left h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="left">
+        <div class="logo">✨ AuraLearn</div>
+        <h1>Start Your Journey.</h1>
+        <p>Set up an account in less than a minute to explore all configuration systems and tracking tools.</p>
+    </div>
+
+    <div class="right">
+        <h2>Create Account</h2>
+        <p class="subtitle">Please fill out the details below to complete your registration.</p>
+
+        <form id="registerForm">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Enter your name" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="name@example.com" required autocomplete="email">
+            </div>
+
+            <div class="input-group">
+                <label>Create Password</label>
+                <input type="password" id="regPassword" placeholder="Minimum 6 characters" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="form-btn">Register</button>
+        </form>
+
+        <div class="toggle-link">
+            Already have an account? <a href="index.html">Go to Login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+
+        // Save account into standard local sandbox memory
+        localStorage.setItem("aura_name", name);
+        localStorage.setItem("aura_email", email);
+        localStorage.setItem("aura_password", password);
+
+        alert("Account registered successfully! Redirecting you to login.");
+        window.location.href = "index.html";
+    });
+</script>
+</body>
+</html>
